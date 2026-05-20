@@ -54,6 +54,22 @@ class SchemaTest extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @testdox `wc_customer_lookup` has the customer-view columns after WC_Install::create_tables().
+	 */
+	public function test_wc_customer_lookup_has_new_columns(): void {
+		global $wpdb;
+		WC_Install::create_tables();
+		$table = $wpdb->prefix . 'wc_customer_lookup';
+		// SHOW COLUMNS does not support table-name placeholders; $table is built from $wpdb->prefix.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results( "SHOW COLUMNS FROM {$table}", ARRAY_A );
+		$cols = wp_list_pluck( $rows, 'Field' );
+		foreach ( array( 'lifecycle_status', 'lifecycle_overridden', 'created_via', 'merged_into_customer_id', 'notes_count' ) as $col ) {
+			$this->assertContains( $col, $cols, "wc_customer_lookup missing column: {$col}" );
+		}
+	}
+
+	/**
 	 * Helper: install and assert that `{prefix}{$name}` exists.
 	 *
 	 * @param string $name Table name without prefix.

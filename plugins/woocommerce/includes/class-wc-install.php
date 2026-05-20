@@ -331,6 +331,9 @@ class WC_Install {
 		'10.8.0-2' => array(
 			'wc_update_10802_restore_orders_meta_key_value_index',
 		),
+		'10.9.0'   => array(
+			'wc_update_1090_customer_view_schema',
+		),
 	);
 
 	/**
@@ -2064,9 +2067,16 @@ CREATE TABLE {$wpdb->prefix}wc_customer_lookup (
 	postcode varchar(20) DEFAULT '' NOT NULL,
 	city varchar(100) DEFAULT '' NOT NULL,
 	state varchar(100) DEFAULT '' NOT NULL,
+	lifecycle_status varchar(20) NOT NULL DEFAULT 'new',
+	lifecycle_overridden tinyint(1) NOT NULL DEFAULT 0,
+	created_via varchar(20) NOT NULL DEFAULT 'order',
+	merged_into_customer_id bigint(20) unsigned NULL DEFAULT NULL,
+	notes_count int(10) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (customer_id),
 	UNIQUE KEY user_id (user_id),
-	KEY email (email)
+	KEY email (email),
+	KEY lifecycle_status (lifecycle_status),
+	KEY merged_into (merged_into_customer_id)
 ) $collate;
 CREATE TABLE {$wpdb->prefix}wc_category_lookup (
 	category_tree_id bigint(20) unsigned NOT NULL,

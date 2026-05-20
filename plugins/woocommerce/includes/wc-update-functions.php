@@ -3534,3 +3534,19 @@ function wc_update_10802_restore_orders_meta_key_value_index(): void {
 function wc_update_1080_backfill_email_template_sync_meta(): bool {
 	return WCEmailTemplateSyncBackfill::run();
 }
+
+/**
+ * Apply the customer-view schema on upgrade: new columns on `wc_customer_lookup`
+ * and the new `wc_customer_notes`, `wc_customer_tags`, `wc_customer_tag_relationships`,
+ * and `wc_customer_payment_events` tables.
+ *
+ * Re-running `WC_Install::create_tables()` is safe because `dbDelta()` is
+ * idempotent — new columns and tables are added without disturbing existing data.
+ *
+ * @since 10.9.0
+ *
+ * @return void
+ */
+function wc_update_1090_customer_view_schema(): void {
+	WC_Install::create_tables();
+}

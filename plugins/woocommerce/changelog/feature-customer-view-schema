@@ -1,0 +1,4 @@
+Significance: minor
+Type: add
+
+Add customer view database schema: extend wc_customer_lookup with lifecycle, created_via, merged_into, and notes_count columns; introduce wc_customer_notes, wc_customer_tags, wc_customer_tag_relationships, and wc_customer_payment_events tables.
