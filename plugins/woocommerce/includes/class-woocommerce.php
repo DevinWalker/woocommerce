@@ -383,6 +383,7 @@ final class WooCommerce {
 		$container->get( \Automattic\WooCommerce\Internal\Customers\LifecycleScheduler::class );
 		if ( is_admin() ) {
 			$container->get( \Automattic\WooCommerce\Internal\Customers\Admin\UsersListIntegration::class );
+			$container->get( \Automattic\WooCommerce\Internal\Customers\Admin\ReportsCustomersEnricher::class );
 		}
 
 		// Feature flags.

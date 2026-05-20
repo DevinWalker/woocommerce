@@ -17,6 +17,7 @@ import { CurrencyContext } from '@woocommerce/currency';
  */
 import ReportTable from '../../components/report-table';
 import { getAdminSetting } from '~/utils/admin-settings';
+import { isFeatureEnabled } from '~/utils/features';
 
 function CustomersReportTable( {
 	isRequesting,
@@ -34,8 +35,10 @@ function CustomersReportTable( {
 		};
 	} );
 
+	const customerViewEnabled = isFeatureEnabled( 'customer_view' );
+
 	const getHeadersContent = () => {
-		return [
+		const headers = [
 			{
 				label: __( 'Name', 'woocommerce' ),
 				key: 'name',
@@ -105,6 +108,21 @@ function CustomersReportTable( {
 				isSortable: true,
 			},
 		];
+		if ( customerViewEnabled ) {
+			headers.push(
+				{
+					label: __( 'Lifecycle', 'woocommerce' ),
+					key: 'lifecycle_status',
+					hiddenByDefault: true,
+				},
+				{
+					label: __( 'Tags', 'woocommerce' ),
+					key: 'tags',
+					hiddenByDefault: true,
+				}
+			);
+		}
+		return headers;
 	};
 
 	const getCountryName = ( code ) => {
@@ -131,6 +149,7 @@ function CustomersReportTable( {
 				date_registered: dateRegistered,
 				email,
 				name,
+				id: customerId,
 				user_id: userId,
 				orders_count: ordersCount,
 				username,
@@ -139,6 +158,8 @@ function CustomersReportTable( {
 				city,
 				state,
 				country,
+				lifecycle_status: lifecycleStatus,
+				tags: customerTags,
 			} = customer;
 			const countryName = getCountryName( country );
 			const customerName =
@@ -148,16 +169,32 @@ function CustomersReportTable( {
 					<Pill>{ __( 'Guest', 'woocommerce' ) }</Pill>
 				);
 
-			const customerNameLink = userId ? (
-				<Link
-					href={ getAdminLink( 'user-edit.php?user_id=' + userId ) }
-					type="wp-admin"
-				>
-					{ name }
-				</Link>
-			) : (
-				customerName
-			);
+			let customerNameLink;
+			if ( customerViewEnabled && customerId ) {
+				customerNameLink = (
+					<Link
+						href={ getAdminLink(
+							`admin.php?page=wc-admin&path=/customers/${ customerId }`
+						) }
+						type="wc-admin"
+					>
+						{ name || customerName }
+					</Link>
+				);
+			} else if ( userId ) {
+				customerNameLink = (
+					<Link
+						href={ getAdminLink(
+							'user-edit.php?user_id=' + userId
+						) }
+						type="wp-admin"
+					>
+						{ name }
+					</Link>
+				);
+			} else {
+				customerNameLink = customerName;
+			}
 
 			const dateLastActiveDisplay = dateLastActive ? (
 				<Date date={ dateLastActive } visibleFormat={ dateFormat } />
@@ -233,6 +270,53 @@ function CustomersReportTable( {
 					display: postcode,
 					value: postcode,
 				},
+				...( customerViewEnabled
+					? [
+							{
+								display: lifecycleStatus ? (
+									<span
+										className={ `wc-lifecycle wc-lifecycle--${ lifecycleStatus }` }
+									>
+										{ lifecycleStatus }
+									</span>
+								) : (
+									'—'
+								),
+								value: lifecycleStatus,
+							},
+							{
+								display:
+									Array.isArray( customerTags ) &&
+									customerTags.length > 0 ? (
+										<ul className="wc-customer-tags-cell">
+											{ customerTags.map( ( tag ) => (
+												<li
+													key={ tag.tag_id }
+													className="wc-tag-chip"
+													style={
+														tag.color
+															? {
+																	backgroundColor:
+																		tag.color,
+															  }
+															: undefined
+													}
+												>
+													{ tag.name }
+												</li>
+											) ) }
+										</ul>
+									) : (
+										'—'
+									),
+								value: Array.isArray( customerTags )
+									? customerTags
+											.map( ( t ) => t.slug )
+											.join( ',' )
+									: '',
+							},
+					  ]
+					: [] ),
 			];
 		} );
 	};

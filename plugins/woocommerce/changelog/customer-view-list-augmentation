@@ -1,0 +1,3 @@
+Significance: minor
+Type: add
+Comment: Link customer name to the new detail page and add optional Lifecycle and Tags columns on the Analytics > Customers list (gated by the customer_view feature flag).
