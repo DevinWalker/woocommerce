@@ -6,10 +6,7 @@ import { select, dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	STORE_NAME,
-	registerCustomerViewStore,
-} from '../store';
+import { STORE_NAME, registerCustomerViewStore } from '../store';
 import type { CustomerNote, CustomerTag } from '../types';
 
 describe( 'customer-view store', () => {

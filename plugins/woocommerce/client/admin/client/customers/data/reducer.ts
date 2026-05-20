@@ -165,7 +165,9 @@ export function reducer( state: State = DEFAULT_STATE, action: Action ): State {
 			} );
 
 		case actionTypes.SET_NOTES:
-			return withSlice( state, action.customerId, { notes: action.notes } );
+			return withSlice( state, action.customerId, {
+				notes: action.notes,
+			} );
 
 		case actionTypes.ADD_NOTE: {
 			const prev = state.byId[ action.customerId ] ?? getInitialSlice();
@@ -177,7 +179,9 @@ export function reducer( state: State = DEFAULT_STATE, action: Action ): State {
 		case actionTypes.REMOVE_NOTE: {
 			const prev = state.byId[ action.customerId ] ?? getInitialSlice();
 			return withSlice( state, action.customerId, {
-				notes: prev.notes.filter( ( n ) => n.note_id !== action.noteId ),
+				notes: prev.notes.filter(
+					( n ) => n.note_id !== action.noteId
+				),
 			} );
 		}
 
@@ -221,7 +225,9 @@ export function reducer( state: State = DEFAULT_STATE, action: Action ): State {
 			} );
 
 		case actionTypes.SET_ERROR:
-			return withSlice( state, action.customerId, { error: action.error } );
+			return withSlice( state, action.customerId, {
+				error: action.error,
+			} );
 
 		case actionTypes.SET_ALL_TAGS:
 			return { ...state, allTags: action.tags };

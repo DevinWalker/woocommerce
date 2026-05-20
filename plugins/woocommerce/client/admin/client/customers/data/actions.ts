@@ -24,46 +24,42 @@ export const setCustomer = ( customerId: number, customer: Customer ) =>
 		type: actionTypes.SET_CUSTOMER,
 		customerId,
 		customer,
-	} ) as const;
+	} as const );
 
 export const setNotes = ( customerId: number, notes: CustomerNote[] ) =>
-	( { type: actionTypes.SET_NOTES, customerId, notes } ) as const;
+	( { type: actionTypes.SET_NOTES, customerId, notes } as const );
 
 export const addNoteToState = ( customerId: number, note: CustomerNote ) =>
-	( { type: actionTypes.ADD_NOTE, customerId, note } ) as const;
+	( { type: actionTypes.ADD_NOTE, customerId, note } as const );
 
 export const removeNoteFromState = ( customerId: number, noteId: number ) =>
-	( { type: actionTypes.REMOVE_NOTE, customerId, noteId } ) as const;
+	( { type: actionTypes.REMOVE_NOTE, customerId, noteId } as const );
 
 export const updateNoteInState = ( customerId: number, note: CustomerNote ) =>
-	( { type: actionTypes.UPDATE_NOTE, customerId, note } ) as const;
+	( { type: actionTypes.UPDATE_NOTE, customerId, note } as const );
 
 export const setTags = ( customerId: number, tags: CustomerTag[] ) =>
-	( { type: actionTypes.SET_TAGS, customerId, tags } ) as const;
+	( { type: actionTypes.SET_TAGS, customerId, tags } as const );
 
 export const addTagToState = ( customerId: number, tag: CustomerTag ) =>
-	( { type: actionTypes.ADD_TAG, customerId, tag } ) as const;
+	( { type: actionTypes.ADD_TAG, customerId, tag } as const );
 
 export const removeTagFromState = ( customerId: number, tagId: number ) =>
-	( { type: actionTypes.REMOVE_TAG, customerId, tagId } ) as const;
+	( { type: actionTypes.REMOVE_TAG, customerId, tagId } as const );
 
-export const setTimeline = (
-	customerId: number,
-	events: TimelineEvent[]
-) =>
-	( { type: actionTypes.SET_TIMELINE, customerId, events } ) as const;
+export const setTimeline = ( customerId: number, events: TimelineEvent[] ) =>
+	( { type: actionTypes.SET_TIMELINE, customerId, events } as const );
 
 export const setPaymentEvents = (
 	customerId: number,
 	events: PaymentEvent[]
-) =>
-	( { type: actionTypes.SET_PAYMENT_EVENTS, customerId, events } ) as const;
+) => ( { type: actionTypes.SET_PAYMENT_EVENTS, customerId, events } as const );
 
 export const setError = ( customerId: number, error: string | null ) =>
-	( { type: actionTypes.SET_ERROR, customerId, error } ) as const;
+	( { type: actionTypes.SET_ERROR, customerId, error } as const );
 
 export const setAllTags = ( tags: CustomerTag[] ) =>
-	( { type: actionTypes.SET_ALL_TAGS, tags } ) as const;
+	( { type: actionTypes.SET_ALL_TAGS, tags } as const );
 
 const errorMessage = ( e: unknown, fallback: string ): string => {
 	if ( e && typeof e === 'object' && 'message' in e ) {
@@ -126,7 +122,10 @@ export function* deleteNote( customerId: number, noteId: number ) {
 		} );
 		yield removeNoteFromState( customerId, noteId );
 	} catch ( e ) {
-		yield setError( customerId, errorMessage( e, 'Failed to delete note' ) );
+		yield setError(
+			customerId,
+			errorMessage( e, 'Failed to delete note' )
+		);
 		throw e;
 	}
 }
@@ -176,7 +175,10 @@ export function* setLifecycle(
 		yield setCustomer( customerId, updated );
 		return updated;
 	} catch ( e ) {
-		yield setError( customerId, errorMessage( e, 'Failed to set lifecycle' ) );
+		yield setError(
+			customerId,
+			errorMessage( e, 'Failed to set lifecycle' )
+		);
 		throw e;
 	}
 }
