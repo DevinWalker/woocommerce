@@ -1,0 +1,3 @@
+Significance: patch
+Type: fix
+Comment: Customer detail sections fired requests like /customer-view/undefined/timeline when customer.id was missing from a partially-populated state object. Sections now use the route-parsed customerId directly, resolvers and section effects guard against bad ids, and Header falls back to email or a generic label instead of rendering "undefined".

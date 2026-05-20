@@ -331,6 +331,9 @@ class WC_Install {
 		'10.8.0-2' => array(
 			'wc_update_10802_restore_orders_meta_key_value_index',
 		),
+		'10.9.0'   => array(
+			'wc_update_1090_customer_view_schema',
+		),
 	);
 
 	/**
@@ -2064,14 +2067,64 @@ CREATE TABLE {$wpdb->prefix}wc_customer_lookup (
 	postcode varchar(20) DEFAULT '' NOT NULL,
 	city varchar(100) DEFAULT '' NOT NULL,
 	state varchar(100) DEFAULT '' NOT NULL,
+	lifecycle_status varchar(20) NOT NULL DEFAULT 'new',
+	lifecycle_overridden tinyint(1) NOT NULL DEFAULT 0,
+	created_via varchar(20) NOT NULL DEFAULT 'order',
+	merged_into_customer_id bigint(20) unsigned NULL DEFAULT NULL,
+	notes_count int(10) unsigned NOT NULL DEFAULT 0,
 	PRIMARY KEY (customer_id),
 	UNIQUE KEY user_id (user_id),
-	KEY email (email)
+	KEY email (email),
+	KEY lifecycle_status (lifecycle_status),
+	KEY merged_into (merged_into_customer_id)
 ) $collate;
 CREATE TABLE {$wpdb->prefix}wc_category_lookup (
 	category_tree_id bigint(20) unsigned NOT NULL,
 	category_id bigint(20) unsigned NOT NULL,
 	PRIMARY KEY (category_tree_id,category_id)
+) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_notes (
+	note_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	customer_id bigint(20) unsigned NOT NULL,
+	author_id bigint(20) unsigned NOT NULL,
+	content longtext NOT NULL,
+	created_at datetime NOT NULL,
+	updated_at datetime NULL DEFAULT NULL,
+	PRIMARY KEY  (note_id),
+	KEY customer_created (customer_id, created_at)
+) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_tags (
+	tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	slug varchar(100) NOT NULL,
+	name varchar(190) NOT NULL,
+	color varchar(7) NULL DEFAULT NULL,
+	created_at datetime NOT NULL,
+	PRIMARY KEY  (tag_id),
+	UNIQUE KEY slug (slug)
+) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_tag_relationships (
+	customer_id bigint(20) unsigned NOT NULL,
+	tag_id bigint(20) unsigned NOT NULL,
+	assigned_at datetime NOT NULL,
+	assigned_by bigint(20) unsigned NOT NULL,
+	PRIMARY KEY  (customer_id, tag_id),
+	KEY tag (tag_id)
+) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_payment_events (
+	event_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	customer_id bigint(20) unsigned NOT NULL,
+	order_id bigint(20) unsigned NOT NULL,
+	type varchar(20) NOT NULL,
+	amount decimal(26,8) NOT NULL,
+	currency char(3) NOT NULL,
+	gateway varchar(100) NOT NULL,
+	status varchar(40) NOT NULL,
+	external_id varchar(200) NULL DEFAULT NULL,
+	created_at datetime NOT NULL,
+	PRIMARY KEY  (event_id),
+	KEY customer_time (customer_id, created_at),
+	KEY order_id (order_id),
+	UNIQUE KEY external (gateway, external_id)
 ) $collate;
 $hpos_table_schema;
 $stock_notifications_table_schema;
@@ -2123,6 +2176,10 @@ $stock_notifications_table_schema;
 			"{$wpdb->prefix}wc_admin_notes",
 			"{$wpdb->prefix}wc_admin_note_actions",
 			"{$wpdb->prefix}wc_customer_lookup",
+			"{$wpdb->prefix}wc_customer_notes",
+			"{$wpdb->prefix}wc_customer_tags",
+			"{$wpdb->prefix}wc_customer_tag_relationships",
+			"{$wpdb->prefix}wc_customer_payment_events",
 			"{$wpdb->prefix}wc_category_lookup",
 			"{$wpdb->prefix}wc_order_fulfillments",
 			"{$wpdb->prefix}wc_order_fulfillment_meta",

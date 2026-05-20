@@ -22,6 +22,14 @@ use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Products\Controller as Pro
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\PaymentGateways\Controller as PaymentGatewaysController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\OfflinePaymentMethods\Controller as OfflinePaymentMethodsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Customers\Controller as CustomersController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\Controller as CustomerViewController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\NotesController as CustomerViewNotesController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\TagsController as CustomerViewTagsController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\TimelineController as CustomerViewTimelineController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\PaymentEventsController as CustomerViewPaymentEventsController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\LifecycleController as CustomerViewLifecycleController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\MergeController as CustomerViewMergeController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\PromoteController as CustomerViewPromoteController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\General\Controller as GeneralSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Email\Controller as EmailSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Tax\Controller as TaxSettingsController;
@@ -236,6 +244,14 @@ class Server {
 			'fulfillments'              => FulfillmentsController::class,
 			'products'                  => ProductsController::class,
 			'customers'                 => CustomersController::class,
+			'customer-view'             => CustomerViewController::class,
+			'customer-view-notes'       => CustomerViewNotesController::class,
+			'customer-view-tags'        => CustomerViewTagsController::class,
+			'customer-view-timeline'    => CustomerViewTimelineController::class,
+			'customer-view-payments'    => CustomerViewPaymentEventsController::class,
+			'customer-view-lifecycle'   => CustomerViewLifecycleController::class,
+			'customer-view-merge'       => CustomerViewMergeController::class,
+			'customer-view-promote'     => CustomerViewPromoteController::class,
 			'order-notes'               => OrderNotesController::class,
 			'shipping-zones'            => ShippingZonesController::class,
 			'shipping-zone-method'      => ShippingZoneMethodController::class,

@@ -1462,4 +1462,19 @@ class FeaturesControllerTest extends \WC_Unit_Test_Case {
 		$this->assertNotContains( 'plugin/plugin.php', $compat_after['compatible'] );
 		$this->assertContains( 'plugin/plugin.php', $compat_after['uncertain'] );
 	}
+
+	/**
+	 * @testdox The 'customer_view' feature is registered, experimental, and disabled by default.
+	 */
+	public function test_customer_view_feature_is_registered() {
+		// Remove this test class's dummy-feature override and the existing controller instance so
+		// we observe the real production feature definitions registered in FeaturesController::init_feature_definitions().
+		remove_action( 'woocommerce_register_feature_definitions', array( $this, 'register_dummy_features' ), 11 );
+		$this->reset_container_resolutions();
+
+		$controller = wc_get_container()->get( FeaturesController::class );
+		$features   = $controller->get_features( true );
+		$this->assertArrayHasKey( 'customer_view', $features );
+		$this->assertFalse( $controller->feature_is_enabled( 'customer_view' ) );
+	}
 }

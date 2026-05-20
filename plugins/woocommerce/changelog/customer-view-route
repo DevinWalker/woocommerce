@@ -1,0 +1,3 @@
+Significance: minor
+Type: add
+Comment: Register the /customers/:id React route under the customer_view feature flag (placeholder detail page).

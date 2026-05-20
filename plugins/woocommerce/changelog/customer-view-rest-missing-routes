@@ -1,0 +1,3 @@
+Significance: minor
+Type: add
+Comment: Add three missing customer-view read endpoints the React UI was calling: GET /wc/v4/customer-view (search by email/name/username for the merge target picker), GET /wc/v4/customer-view/tags (global tag list for the tag picker modal), and GET /wc/v4/customer-view/:id/sections (per-customer optional-section feature detection).

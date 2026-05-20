@@ -1,0 +1,3 @@
+Significance: patch
+Type: fix
+Comment: Detail page crashed with "Cannot read properties of undefined (reading 'length')" because TagChips assumed customer.tags was always defined and the lifecycle endpoint returned only a partial customer object. TagChips now tolerates undefined/null tags, the lifecycle and merge action flows preserve full customer state, and the lifecycle endpoints return the full customer-view schema.

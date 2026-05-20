@@ -76,6 +76,10 @@ const LaunchStore = lazy( () =>
 	import( /* webpackChunkName: "launch-store" */ '../launch-your-store/hub' )
 );
 
+const CustomerDetail = lazy( () =>
+	import( /* webpackChunkName: "customer-detail" */ '../customers/detail' )
+);
+
 export const PAGES_FILTER = 'woocommerce_admin_pages_list';
 
 export const getPages = ( reports = [] ) => {
@@ -137,6 +141,22 @@ export const getPages = ( reports = [] ) => {
 			},
 			capability: 'view_woocommerce_reports',
 		} );
+		if ( isFeatureEnabled( 'customer_view' ) ) {
+			pages.push( {
+				container: CustomerDetail,
+				path: '/customers/:id',
+				breadcrumbs: [
+					...initialBreadcrumbs,
+					[ '/customers', __( 'Customers', 'woocommerce' ) ],
+					__( 'Customer', 'woocommerce' ),
+				],
+				wpOpenMenu: 'toplevel_page_woocommerce',
+				navArgs: {
+					id: 'woocommerce-customer-view',
+				},
+				capability: 'manage_woocommerce',
+			} );
+		}
 		pages.push( {
 			container: AnalyticsReport,
 			path: '/analytics/:report',

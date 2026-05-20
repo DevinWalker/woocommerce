@@ -378,6 +378,13 @@ final class WooCommerce {
 		$container->get( ProductVersionStringInvalidator::class );
 		$container->get( OrdersVersionStringInvalidator::class );
 		$container->get( TaxRateVersionStringInvalidator::class );
+		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsListener::class );
+		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsBackfill::class );
+		$container->get( \Automattic\WooCommerce\Internal\Customers\LifecycleScheduler::class );
+		if ( is_admin() ) {
+			$container->get( \Automattic\WooCommerce\Internal\Customers\Admin\UsersListIntegration::class );
+			$container->get( \Automattic\WooCommerce\Internal\Customers\Admin\ReportsCustomersEnricher::class );
+		}
 
 		// Feature flags.
 		if ( Constants::is_true( 'WOOCOMMERCE_BIS_ALPHA_ENABLED' ) ) {
@@ -759,6 +766,7 @@ final class WooCommerce {
 		include_once WC_ABSPATH . 'includes/admin/marketplace-suggestions/class-wc-marketplace-updater.php';
 		include_once WC_ABSPATH . 'includes/admin/class-wc-admin-marketplace-promotions.php';
 		include_once WC_ABSPATH . 'includes/blocks/class-wc-blocks-utils.php';
+		include_once WC_ABSPATH . 'includes/customers/class-wc-customer-payment-events.php';
 
 		/**
 		 * Data stores - used to store and retrieve CRUD object data from the database.

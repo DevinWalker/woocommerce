@@ -1,0 +1,4 @@
+Significance: minor
+Type: add
+
+Add customer-view write endpoints: POST/DELETE /wc/v4/customer-view/:id/lifecycle for manual lifecycle override, POST /wc/v4/customer-view/:id/merge to consolidate two customer records, and POST /wc/v4/customer-view/promote to create a customer record for a registered WP user with no purchase history.
