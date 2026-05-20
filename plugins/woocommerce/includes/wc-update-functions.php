@@ -3549,4 +3549,5 @@ function wc_update_1080_backfill_email_template_sync_meta(): bool {
  */
 function wc_update_1090_customer_view_schema(): void {
 	WC_Install::create_tables();
+	\Automattic\WooCommerce\Internal\Customers\PaymentEventsBackfill::schedule_first_run();
 }
