@@ -45,8 +45,10 @@ class SchemaTest extends \WC_Unit_Test_Case {
 	public function test_wc_customer_payment_events_has_unique_external_index(): void {
 		global $wpdb;
 		WC_Install::create_tables();
-		$table   = $wpdb->prefix . 'wc_customer_payment_events';
-		$indexes = $wpdb->get_results( "SHOW INDEX FROM {$table} WHERE Key_name='external'", ARRAY_A );
+		$table = $wpdb->prefix . 'wc_customer_payment_events';
+		// SHOW INDEX FROM does not support table-name placeholders; $table is built from $wpdb->prefix.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$indexes = $wpdb->get_results( "SHOW INDEX FROM {$table} WHERE Key_name = 'external'", ARRAY_A );
 		$this->assertNotEmpty( $indexes, 'expected `external` index on wc_customer_payment_events' );
 		$this->assertSame( '0', (string) $indexes[0]['Non_unique'], '`external` index should be unique' );
 	}
