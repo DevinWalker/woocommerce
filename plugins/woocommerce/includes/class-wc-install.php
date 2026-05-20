@@ -2073,6 +2073,16 @@ CREATE TABLE {$wpdb->prefix}wc_category_lookup (
 	category_id bigint(20) unsigned NOT NULL,
 	PRIMARY KEY (category_tree_id,category_id)
 ) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_notes (
+	note_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	customer_id bigint(20) unsigned NOT NULL,
+	author_id bigint(20) unsigned NOT NULL,
+	content longtext NOT NULL,
+	created_at datetime NOT NULL,
+	updated_at datetime NULL DEFAULT NULL,
+	PRIMARY KEY  (note_id),
+	KEY customer_created (customer_id, created_at)
+) $collate;
 $hpos_table_schema;
 $stock_notifications_table_schema;
 		";
@@ -2123,6 +2133,7 @@ $stock_notifications_table_schema;
 			"{$wpdb->prefix}wc_admin_notes",
 			"{$wpdb->prefix}wc_admin_note_actions",
 			"{$wpdb->prefix}wc_customer_lookup",
+			"{$wpdb->prefix}wc_customer_notes",
 			"{$wpdb->prefix}wc_category_lookup",
 			"{$wpdb->prefix}wc_order_fulfillments",
 			"{$wpdb->prefix}wc_order_fulfillment_meta",
