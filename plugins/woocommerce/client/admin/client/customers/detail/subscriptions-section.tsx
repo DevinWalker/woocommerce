@@ -19,6 +19,10 @@ export function SubscriptionsSection( { customerId }: { customerId: number } ) {
 
 	useEffect( () => {
 		let cancelled = false;
+		if ( ! Number.isFinite( customerId ) || customerId <= 0 ) {
+			setEnabled( false );
+			return;
+		}
 		apiFetch< Sections >( {
 			path: `${ REST_NAMESPACE }/${ customerId }/sections`,
 		} )

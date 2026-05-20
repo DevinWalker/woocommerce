@@ -75,19 +75,23 @@ export default function CustomerDetail( { params }: Props ) {
 		return null;
 	}
 
+	// Use the route-parsed customerId for section fetches rather than
+	// customer.id; the former is guaranteed to be a positive integer here
+	// (the shell guard above bails otherwise), the latter could be missing
+	// if some action ever dispatched a partial customer object into state.
 	return (
 		<div className="wc-customer-view">
 			<Header customer={ customer } />
 			<StatsStrip customer={ customer } />
 			<div className="wc-customer-view__grid">
 				<div className="wc-customer-view__column wc-customer-view__column--main">
-					<Timeline customerId={ customer.id } />
+					<Timeline customerId={ customerId } />
 					<OrdersSection customer={ customer } />
-					<SubscriptionsSection customerId={ customer.id } />
-					<PaymentEventsSection customerId={ customer.id } />
+					<SubscriptionsSection customerId={ customerId } />
+					<PaymentEventsSection customerId={ customerId } />
 				</div>
 				<div className="wc-customer-view__column wc-customer-view__column--side">
-					<NotesSection customerId={ customer.id } />
+					<NotesSection customerId={ customerId } />
 					<AddressesSection customer={ customer } />
 				</div>
 			</div>

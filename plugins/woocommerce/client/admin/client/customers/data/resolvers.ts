@@ -29,7 +29,15 @@ const fail = ( customerId: number, msg: string ) => setError( customerId, msg );
 const asArray = < T >( value: unknown ): T[] =>
 	Array.isArray( value ) ? ( value as T[] ) : [];
 
+const isValidId = ( customerId: unknown ): customerId is number =>
+	typeof customerId === 'number' &&
+	Number.isFinite( customerId ) &&
+	customerId > 0;
+
 export function* getCustomer( customerId: number ) {
+	if ( ! isValidId( customerId ) ) {
+		return;
+	}
 	try {
 		const customer: Customer = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }`,
@@ -44,6 +52,9 @@ export function* getCustomer( customerId: number ) {
 }
 
 export function* getNotes( customerId: number ) {
+	if ( ! isValidId( customerId ) ) {
+		return;
+	}
 	try {
 		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/notes`,
@@ -58,6 +69,9 @@ export function* getNotes( customerId: number ) {
 }
 
 export function* getTags( customerId: number ) {
+	if ( ! isValidId( customerId ) ) {
+		return;
+	}
 	try {
 		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/tags`,
@@ -72,6 +86,9 @@ export function* getTags( customerId: number ) {
 }
 
 export function* getTimeline( customerId: number ) {
+	if ( ! isValidId( customerId ) ) {
+		return;
+	}
 	try {
 		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/timeline`,
@@ -86,6 +103,9 @@ export function* getTimeline( customerId: number ) {
 }
 
 export function* getPaymentEvents( customerId: number ) {
+	if ( ! isValidId( customerId ) ) {
+		return;
+	}
 	try {
 		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/payment-events`,

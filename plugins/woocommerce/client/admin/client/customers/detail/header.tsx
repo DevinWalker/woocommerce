@@ -31,8 +31,13 @@ export function Header( { customer }: { customer: Customer } ) {
 	const [ showMergeModal, setShowMergeModal ] = useState( false );
 
 	const displayName =
-		`${ customer.first_name } ${ customer.last_name }`.trim() ||
-		customer.email;
+		[ customer.first_name, customer.last_name ]
+			.filter(
+				( part ) => typeof part === 'string' && part.trim() !== ''
+			)
+			.join( ' ' ) ||
+		customer.email ||
+		__( 'Unknown customer', 'woocommerce' );
 
 	return (
 		<header className="wc-customer-view__header">

@@ -106,8 +106,12 @@ export function Timeline( { customerId }: { customerId: number } ) {
 	);
 	const { fetchTimeline } = useDispatch( STORE_NAME );
 
-	// Initial load + refetch when filters change.
+	// Initial load + refetch when filters change. Guard against bad ids so a
+	// partial / corrupted customer object never produces /customer-view/undefined/timeline.
 	useEffect( () => {
+		if ( ! Number.isFinite( customerId ) || customerId <= 0 ) {
+			return;
+		}
 		fetchTimeline( customerId, { types: activeTypes } );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ customerId, activeTypes.join( ',' ) ] );
