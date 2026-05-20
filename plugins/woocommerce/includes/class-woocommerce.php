@@ -381,6 +381,9 @@ final class WooCommerce {
 		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsListener::class );
 		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsBackfill::class );
 		$container->get( \Automattic\WooCommerce\Internal\Customers\LifecycleScheduler::class );
+		if ( is_admin() ) {
+			$container->get( \Automattic\WooCommerce\Internal\Customers\Admin\UsersListIntegration::class );
+		}
 
 		// Feature flags.
 		if ( Constants::is_true( 'WOOCOMMERCE_BIS_ALPHA_ENABLED' ) ) {

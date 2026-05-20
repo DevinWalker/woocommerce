@@ -1,0 +1,4 @@
+Significance: minor
+Type: add
+
+Wire up the customer-view backend lifecycle: auto-capture payment events on woocommerce_payment_complete / _order_refunded / _order_partially_refunded, run a nightly Action Scheduler sweep to recompute lifecycle for non-overridden customers, backfill historical payment events on upgrade, and add a "Promote to customer" row action on wp-admin/users.php for registered users with no purchase history yet.
