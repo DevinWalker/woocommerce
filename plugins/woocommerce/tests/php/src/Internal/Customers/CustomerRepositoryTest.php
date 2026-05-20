@@ -12,10 +12,103 @@ use Automattic\WooCommerce\Internal\Customers\CustomerRepository;
 class CustomerRepositoryTest extends \WC_Unit_Test_Case {
 
 	/**
+	 * Service instance.
+	 *
+	 * @var CustomerRepository
+	 */
+	private CustomerRepository $repo;
+
+	/**
+	 * Test setup.
+	 */
+	public function setUp(): void {
+		parent::setUp();
+		$this->repo = wc_get_container()->get( CustomerRepository::class );
+	}
+
+	/**
 	 * @testdox CustomerRepository resolves from the WooCommerce container.
 	 */
 	public function test_customer_repository_is_resolvable_from_container(): void {
-		$repo = wc_get_container()->get( CustomerRepository::class );
-		$this->assertInstanceOf( CustomerRepository::class, $repo );
+		$this->assertInstanceOf( CustomerRepository::class, $this->repo );
+	}
+
+	/**
+	 * @testdox find() returns null for an unknown customer id.
+	 */
+	public function test_find_returns_null_for_unknown_id(): void {
+		$this->assertNull( $this->repo->find( 999999 ) );
+	}
+
+	/**
+	 * @testdox find() returns the row for a known customer id, with customer_id coerced to int.
+	 */
+	public function test_find_returns_array_for_known_customer(): void {
+		$id = $this->insert_lookup_row(
+			array(
+				'email'            => 'a@b.test',
+				'lifecycle_status' => 'new',
+			)
+		);
+
+		$row = $this->repo->find( $id );
+
+		$this->assertIsArray( $row );
+		$this->assertSame( $id, $row['customer_id'] );
+		$this->assertSame( 'a@b.test', $row['email'] );
+		$this->assertSame( 'new', $row['lifecycle_status'] );
+	}
+
+	/**
+	 * @testdox find() follows merge redirect when $follow_merge=true, and exposes merged_into_customer_id when false.
+	 */
+	public function test_find_follows_merge_redirect(): void {
+		$target = $this->insert_lookup_row( array( 'email' => 't@x.test' ) );
+		$source = $this->insert_lookup_row(
+			array(
+				'email'                   => 's@x.test',
+				'merged_into_customer_id' => $target,
+			)
+		);
+
+		// Sanity: source row should have the merged_into pointer.
+		$raw_source = $this->repo->find( $source, false );
+		$this->assertNotNull( $raw_source, 'source row should exist' );
+		$this->assertSame( $target, (int) $raw_source['merged_into_customer_id'] );
+
+		$followed = $this->repo->find( $source, true );
+		$this->assertNotNull( $followed, 'find( source, true ) should resolve to target row' );
+		$this->assertSame( $target, $followed['customer_id'] );
+
+		$unfollowed = $this->repo->find( $source, false );
+		$this->assertSame( $source, $unfollowed['customer_id'] );
+		$this->assertSame( $target, (int) $unfollowed['merged_into_customer_id'] );
+	}
+
+	/**
+	 * Insert a wc_customer_lookup row for tests. Returns the new customer_id.
+	 *
+	 * @param array $overrides Field overrides.
+	 *
+	 * @return int
+	 */
+	private function insert_lookup_row( array $overrides = array() ): int {
+		global $wpdb;
+		$defaults = array(
+			// Leave user_id as NULL (guest); the column has a UNIQUE KEY so 0 would collide between rows.
+			'user_id'          => null,
+			'email'            => uniqid( 'e' ) . '@x.test',
+			'username'         => '',
+			'first_name'       => '',
+			'last_name'        => '',
+			'date_last_active' => current_time( 'mysql', 1 ),
+			'date_registered'  => current_time( 'mysql', 1 ),
+			'country'          => '',
+			'postcode'         => '',
+			'city'             => '',
+			'state'            => '',
+		);
+		$wpdb->insert( $wpdb->prefix . 'wc_customer_lookup', array_merge( $defaults, $overrides ) );
+		return (int) $wpdb->insert_id;
 	}
 }
