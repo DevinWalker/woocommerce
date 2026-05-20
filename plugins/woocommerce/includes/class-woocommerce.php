@@ -380,6 +380,7 @@ final class WooCommerce {
 		$container->get( TaxRateVersionStringInvalidator::class );
 		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsListener::class );
 		$container->get( \Automattic\WooCommerce\Internal\Customers\PaymentEventsBackfill::class );
+		$container->get( \Automattic\WooCommerce\Internal\Customers\LifecycleScheduler::class );
 
 		// Feature flags.
 		if ( Constants::is_true( 'WOOCOMMERCE_BIS_ALPHA_ENABLED' ) ) {
