@@ -15,10 +15,33 @@ class SchemaTest extends \WC_Unit_Test_Case {
 	 * @testdox `wc_customer_notes` table exists after WC_Install::create_tables().
 	 */
 	public function test_wc_customer_notes_table_exists(): void {
+		$this->assert_table_exists( 'wc_customer_notes' );
+	}
+
+	/**
+	 * @testdox `wc_customer_tags` table exists after WC_Install::create_tables().
+	 */
+	public function test_wc_customer_tags_table_exists(): void {
+		$this->assert_table_exists( 'wc_customer_tags' );
+	}
+
+	/**
+	 * @testdox `wc_customer_tag_relationships` table exists after WC_Install::create_tables().
+	 */
+	public function test_wc_customer_tag_relationships_table_exists(): void {
+		$this->assert_table_exists( 'wc_customer_tag_relationships' );
+	}
+
+	/**
+	 * Helper: install and assert that `{prefix}{$name}` exists.
+	 *
+	 * @param string $name Table name without prefix.
+	 */
+	private function assert_table_exists( string $name ): void {
 		global $wpdb;
 		WC_Install::create_tables();
-		$table = $wpdb->prefix . 'wc_customer_notes';
+		$table = $wpdb->prefix . $name;
 		$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
-		$this->assertSame( $table, $found, 'wc_customer_notes table should exist after install' );
+		$this->assertSame( $table, $found, "{$name} table should exist after install" );
 	}
 }

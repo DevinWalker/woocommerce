@@ -2083,6 +2083,23 @@ CREATE TABLE {$wpdb->prefix}wc_customer_notes (
 	PRIMARY KEY  (note_id),
 	KEY customer_created (customer_id, created_at)
 ) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_tags (
+	tag_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	slug varchar(100) NOT NULL,
+	name varchar(190) NOT NULL,
+	color varchar(7) NULL DEFAULT NULL,
+	created_at datetime NOT NULL,
+	PRIMARY KEY  (tag_id),
+	UNIQUE KEY slug (slug)
+) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_tag_relationships (
+	customer_id bigint(20) unsigned NOT NULL,
+	tag_id bigint(20) unsigned NOT NULL,
+	assigned_at datetime NOT NULL,
+	assigned_by bigint(20) unsigned NOT NULL,
+	PRIMARY KEY  (customer_id, tag_id),
+	KEY tag (tag_id)
+) $collate;
 $hpos_table_schema;
 $stock_notifications_table_schema;
 		";
@@ -2134,6 +2151,8 @@ $stock_notifications_table_schema;
 			"{$wpdb->prefix}wc_admin_note_actions",
 			"{$wpdb->prefix}wc_customer_lookup",
 			"{$wpdb->prefix}wc_customer_notes",
+			"{$wpdb->prefix}wc_customer_tags",
+			"{$wpdb->prefix}wc_customer_tag_relationships",
 			"{$wpdb->prefix}wc_category_lookup",
 			"{$wpdb->prefix}wc_order_fulfillments",
 			"{$wpdb->prefix}wc_order_fulfillment_meta",
