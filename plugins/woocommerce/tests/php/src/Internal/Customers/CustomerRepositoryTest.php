@@ -11,6 +11,8 @@ use Automattic\WooCommerce\Internal\Customers\CustomerRepository;
  */
 class CustomerRepositoryTest extends \WC_Unit_Test_Case {
 
+	use CustomerLookupSeederTrait;
+
 	/**
 	 * Service instance.
 	 *
@@ -83,32 +85,5 @@ class CustomerRepositoryTest extends \WC_Unit_Test_Case {
 		$unfollowed = $this->repo->find( $source, false );
 		$this->assertSame( $source, $unfollowed['customer_id'] );
 		$this->assertSame( $target, (int) $unfollowed['merged_into_customer_id'] );
-	}
-
-	/**
-	 * Insert a wc_customer_lookup row for tests. Returns the new customer_id.
-	 *
-	 * @param array $overrides Field overrides.
-	 *
-	 * @return int
-	 */
-	private function insert_lookup_row( array $overrides = array() ): int {
-		global $wpdb;
-		$defaults = array(
-			// Leave user_id as NULL (guest); the column has a UNIQUE KEY so 0 would collide between rows.
-			'user_id'          => null,
-			'email'            => uniqid( 'e' ) . '@x.test',
-			'username'         => '',
-			'first_name'       => '',
-			'last_name'        => '',
-			'date_last_active' => current_time( 'mysql', 1 ),
-			'date_registered'  => current_time( 'mysql', 1 ),
-			'country'          => '',
-			'postcode'         => '',
-			'city'             => '',
-			'state'            => '',
-		);
-		$wpdb->insert( $wpdb->prefix . 'wc_customer_lookup', array_merge( $defaults, $overrides ) );
-		return (int) $wpdb->insert_id;
 	}
 }
