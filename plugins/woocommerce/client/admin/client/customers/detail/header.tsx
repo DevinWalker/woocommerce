@@ -70,7 +70,7 @@ export function Header( { customer }: { customer: Customer } ) {
 								{ __( 'Guest', 'woocommerce' ) }
 							</span>
 						) }
-						<TagChips tags={ customer.tags } />
+						<TagChips tags={ customer.tags ?? [] } />
 						<Button
 							variant="tertiary"
 							size="small"

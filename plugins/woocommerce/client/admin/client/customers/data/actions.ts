@@ -200,15 +200,25 @@ export function* clearLifecycleOverride( customerId: number ) {
 	}
 }
 
+interface MergeSummary {
+	target_customer_id: number;
+	moved: Record< string, number >;
+}
+
 export function* mergeCustomer( sourceId: number, targetId: number ) {
 	try {
-		const updated: Customer = yield apiFetch( {
+		const summary: MergeSummary = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ targetId }/merge`,
 			method: 'POST',
 			data: { source_id: sourceId },
 		} );
-		yield setCustomer( targetId, updated );
-		return updated;
+		// The merge endpoint returns a summary, not a full Customer. Re-fetch
+		// the canonical record so the store stays consistent.
+		const refreshed: Customer = yield apiFetch( {
+			path: `${ REST_NAMESPACE }/${ targetId }`,
+		} );
+		yield setCustomer( targetId, refreshed );
+		return summary;
 	} catch ( e ) {
 		yield setError(
 			targetId,

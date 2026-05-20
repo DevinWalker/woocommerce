@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView;
 
 defined( 'ABSPATH' ) || exit;
 
+use Automattic\WooCommerce\Internal\Customers\CustomerRepository;
 use Automattic\WooCommerce\Internal\Customers\LifecycleCalculator;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\AbstractController;
 use WP_Error;
@@ -41,16 +42,55 @@ class LifecycleController extends AbstractController {
 	private LifecycleCalculator $lifecycle;
 
 	/**
+	 * Customer repository (used to load the row for the full schema response).
+	 *
+	 * @var CustomerRepository
+	 */
+	private CustomerRepository $customers;
+
+	/**
+	 * Customer view schema (used to shape the response so the client cache stays
+	 * consistent with `GET /customer-view/:id`).
+	 *
+	 * @var CustomerViewSchema
+	 */
+	private CustomerViewSchema $customer_view_schema;
+
+	/**
 	 * Container-driven dependency injection.
 	 *
 	 * @internal
 	 *
 	 * @param LifecycleCalculator $lifecycle Lifecycle service.
+	 * @param CustomerRepository  $customers Customer repository.
+	 * @param CustomerViewSchema  $customer_view_schema Customer view schema.
 	 *
 	 * @return void
 	 */
-	final public function init( LifecycleCalculator $lifecycle ): void {
-		$this->lifecycle = $lifecycle;
+	final public function init(
+		LifecycleCalculator $lifecycle,
+		CustomerRepository $customers,
+		CustomerViewSchema $customer_view_schema
+	): void {
+		$this->lifecycle            = $lifecycle;
+		$this->customers            = $customers;
+		$this->customer_view_schema = $customer_view_schema;
+	}
+
+	/**
+	 * Build the canonical customer-view response for a customer id.
+	 *
+	 * @param int                                  $customer_id Customer id.
+	 * @param WP_REST_Request<array<string,mixed>> $request     Request.
+	 *
+	 * @return array|null
+	 */
+	private function build_customer_response( int $customer_id, WP_REST_Request $request ): ?array {
+		$row = $this->customers->find( $customer_id );
+		if ( ! $row ) {
+			return null;
+		}
+		return $this->customer_view_schema->get_item_response( $row, $request );
 	}
 
 	/**
@@ -193,10 +233,7 @@ class LifecycleController extends AbstractController {
 		do_action( 'woocommerce_customer_lifecycle_changed', $customer_id, (string) $old, $status, 'manual' );
 
 		return new WP_REST_Response(
-			array(
-				'lifecycle_status'     => $status,
-				'lifecycle_overridden' => true,
-			),
+			$this->build_customer_response( $customer_id, $request ),
 			200
 		);
 	}
@@ -234,6 +271,9 @@ class LifecycleController extends AbstractController {
 
 		$this->lifecycle->recompute_and_persist( $customer_id );
 
-		return new WP_REST_Response( null, 204 );
+		return new WP_REST_Response(
+			$this->build_customer_response( $customer_id, $request ),
+			200
+		);
 	}
 }

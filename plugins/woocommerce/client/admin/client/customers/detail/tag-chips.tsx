@@ -3,8 +3,12 @@
  */
 import type { CustomerTag } from '../data/types';
 
-export function TagChips( { tags }: { tags: CustomerTag[] } ) {
-	if ( ! tags.length ) {
+export function TagChips( {
+	tags,
+}: {
+	tags: CustomerTag[] | undefined | null;
+} ) {
+	if ( ! tags || ! tags.length ) {
 		return null;
 	}
 	return (
