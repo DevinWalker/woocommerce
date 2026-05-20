@@ -1,0 +1,3 @@
+Significance: minor
+Type: add
+Comment: Expose orders_count, total_spend, avg_order_value, date_first_order, and date_last_order on the /wc/v4/customer-view/:id endpoint so the detail page stats strip shows real figures.

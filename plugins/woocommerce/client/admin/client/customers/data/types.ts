@@ -63,6 +63,7 @@ export interface Customer {
 	orders_count: number;
 	total_spend: string;
 	avg_order_value: string;
+	date_first_order: string | null;
 	date_last_order: string | null;
 	date_registered: string;
 }

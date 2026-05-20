@@ -168,6 +168,69 @@ class CustomerViewSchema extends AbstractSchema {
 					),
 				),
 			),
+			'orders_count'            => array(
+				'description' => __( 'Number of orders attributed to this customer.', 'woocommerce' ),
+				'type'        => 'integer',
+				'context'     => self::VIEW_EDIT_CONTEXT,
+				'readonly'    => true,
+			),
+			'total_spend'             => array(
+				'description' => __( 'Sum of net order totals (decimal string in store currency).', 'woocommerce' ),
+				'type'        => 'string',
+				'context'     => self::VIEW_EDIT_CONTEXT,
+				'readonly'    => true,
+			),
+			'avg_order_value'         => array(
+				'description' => __( 'Average net order value across attributed orders.', 'woocommerce' ),
+				'type'        => 'string',
+				'context'     => self::VIEW_EDIT_CONTEXT,
+				'readonly'    => true,
+			),
+			'date_first_order'        => array(
+				'type'     => array( 'string', 'null' ),
+				'context'  => self::VIEW_EDIT_CONTEXT,
+				'readonly' => true,
+			),
+			'date_last_order'         => array(
+				'type'     => array( 'string', 'null' ),
+				'context'  => self::VIEW_EDIT_CONTEXT,
+				'readonly' => true,
+			),
+		);
+	}
+
+	/**
+	 * Aggregate order stats for a customer from wc_order_stats.
+	 *
+	 * @param int $customer_id Customer id.
+	 *
+	 * @return array{orders_count:int,total_spend:string,avg_order_value:string,date_first_order:?string,date_last_order:?string}
+	 */
+	private function load_order_aggregates( int $customer_id ): array {
+		global $wpdb;
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT
+					COUNT(*)             AS orders_count,
+					COALESCE(SUM(net_total), 0)  AS total_spend,
+					MIN(date_created)    AS date_first_order,
+					MAX(date_created)    AS date_last_order
+				 FROM {$wpdb->prefix}wc_order_stats
+				 WHERE customer_id = %d
+				   AND parent_id = 0",
+				$customer_id
+			),
+			ARRAY_A
+		);
+		$count   = isset( $row['orders_count'] ) ? (int) $row['orders_count'] : 0;
+		$total   = isset( $row['total_spend'] ) ? (string) $row['total_spend'] : '0';
+		$avg     = $count > 0 ? number_format( (float) $total / $count, 2, '.', '' ) : '0.00';
+		return array(
+			'orders_count'     => $count,
+			'total_spend'      => $count > 0 ? number_format( (float) $total, 2, '.', '' ) : '0.00',
+			'avg_order_value'  => $avg,
+			'date_first_order' => $row['date_first_order'] ?? null,
+			'date_last_order'  => $row['date_last_order'] ?? null,
 		);
 	}
 
@@ -195,6 +258,8 @@ class CustomerViewSchema extends AbstractSchema {
 			$this->tags_repository->list_for_customer( (int) $row['customer_id'] )
 		);
 
+		$aggregates = $this->load_order_aggregates( (int) $row['customer_id'] );
+
 		return array(
 			'id'                      => (int) $row['customer_id'],
 			'user_id'                 => isset( $row['user_id'] ) ? (int) $row['user_id'] : null,
@@ -215,6 +280,11 @@ class CustomerViewSchema extends AbstractSchema {
 			'notes_count'             => (int) ( $row['notes_count'] ?? 0 ),
 			'is_registered'           => ! empty( $row['user_id'] ),
 			'tags'                    => $tags,
+			'orders_count'            => $aggregates['orders_count'],
+			'total_spend'             => $aggregates['total_spend'],
+			'avg_order_value'         => $aggregates['avg_order_value'],
+			'date_first_order'        => $aggregates['date_first_order'],
+			'date_last_order'         => $aggregates['date_last_order'],
 		);
 	}
 }
