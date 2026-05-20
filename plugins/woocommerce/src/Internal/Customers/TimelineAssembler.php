@@ -42,57 +42,85 @@ final class TimelineAssembler {
 		$pay_table    = $wpdb->prefix . 'wc_customer_payment_events';
 		$orders_table = $wpdb->prefix . 'wc_order_stats';
 
-		// Build the union once, parameterized on $customer_id three times.
-		$sql = $wpdb->prepare(
-			"SELECT * FROM (
-				(SELECT
-					CONCAT('note_', note_id) AS id,
-					'note_added' AS type,
-					created_at AS occurred_at,
-					author_id AS actor,
-					content AS payload
+		// Fetch each source separately and merge in PHP. This avoids cross-DB
+		// quirks with UNION + CONCAT_WS on the SQLite drop-in used by Studio
+		// and Playground.
+		$notes = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT note_id, created_at, author_id, content
 				 FROM {$notes_table}
-				 WHERE customer_id = %d)
-				UNION ALL
-				(SELECT
-					CONCAT('pay_', event_id) AS id,
-					'payment_event' AS type,
-					created_at AS occurred_at,
-					0 AS actor,
-					CONCAT_WS('|', type, amount, currency, gateway, status, IFNULL(external_id, ''), order_id) AS payload
-				 FROM {$pay_table}
-				 WHERE customer_id = %d)
-				UNION ALL
-				(SELECT
-					CONCAT('order_', order_id) AS id,
-					'order_placed' AS type,
-					date_created AS occurred_at,
-					0 AS actor,
-					CONCAT_WS('|', order_id, status, total_sales) AS payload
-				 FROM {$orders_table}
-				 WHERE customer_id = %d)
-			) AS t
-			ORDER BY occurred_at DESC
-			LIMIT %d OFFSET %d",
-			$customer_id,
-			$customer_id,
-			$customer_id,
-			$per_page,
-			$offset
-		);
-
-		$rows = (array) $wpdb->get_results( $sql, ARRAY_A );
-
-		$events = array_map(
-			static fn( $r ) => array(
-				'id'          => (string) $r['id'],
-				'type'        => (string) $r['type'],
-				'occurred_at' => (string) $r['occurred_at'],
-				'actor'       => (int) $r['actor'],
-				'payload'     => $r['payload'],
+				 WHERE customer_id = %d",
+				$customer_id
 			),
-			$rows
-		);
+			ARRAY_A
+		) ?: array();
+
+		$payments = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT event_id, created_at, type, amount, currency, gateway, status, external_id, order_id
+				 FROM {$pay_table}
+				 WHERE customer_id = %d",
+				$customer_id
+			),
+			ARRAY_A
+		) ?: array();
+
+		$orders = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT order_id, date_created, status, total_sales
+				 FROM {$orders_table}
+				 WHERE customer_id = %d
+				   AND parent_id = 0",
+				$customer_id
+			),
+			ARRAY_A
+		) ?: array();
+
+		$events = array();
+
+		foreach ( $notes as $n ) {
+			$events[] = array(
+				'id'          => 'note_' . (int) $n['note_id'],
+				'type'        => 'note_added',
+				'occurred_at' => (string) $n['created_at'],
+				'actor'       => (int) $n['author_id'],
+				'payload'     => array(
+					'content' => (string) $n['content'],
+				),
+			);
+		}
+
+		foreach ( $payments as $p ) {
+			$events[] = array(
+				'id'          => 'pay_' . (int) $p['event_id'],
+				'type'        => 'payment_event',
+				'occurred_at' => (string) $p['created_at'],
+				'actor'       => 0,
+				'payload'     => array(
+					'event_type'  => (string) $p['type'],
+					'amount'      => (string) $p['amount'],
+					'currency'    => (string) $p['currency'],
+					'gateway'     => (string) $p['gateway'],
+					'status'      => (string) $p['status'],
+					'external_id' => isset( $p['external_id'] ) ? (string) $p['external_id'] : '',
+					'order_id'    => (int) $p['order_id'],
+				),
+			);
+		}
+
+		foreach ( $orders as $o ) {
+			$events[] = array(
+				'id'          => 'order_' . (int) $o['order_id'],
+				'type'        => 'order_placed',
+				'occurred_at' => (string) $o['date_created'],
+				'actor'       => 0,
+				'payload'     => array(
+					'order_id'    => (int) $o['order_id'],
+					'status'      => (string) $o['status'],
+					'total_sales' => (string) $o['total_sales'],
+				),
+			);
+		}
 
 		if ( $types ) {
 			$events = array_values(
@@ -102,6 +130,10 @@ final class TimelineAssembler {
 				)
 			);
 		}
+
+		// Sort by occurred_at DESC, then trim to the requested page window.
+		usort( $events, static fn( $a, $b ) => strcmp( $b['occurred_at'], $a['occurred_at'] ) );
+		$events = array_slice( $events, $offset, $per_page );
 
 		/**
 		 * Filter the assembled timeline events. Extensions append their own.

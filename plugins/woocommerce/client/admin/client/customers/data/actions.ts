@@ -241,7 +241,10 @@ export function* fetchTimeline(
 				per_page: args.per_page,
 			}
 		);
-		const events: TimelineEvent[] = yield apiFetch( { path } );
+		const raw: unknown = yield apiFetch( { path } );
+		const events: TimelineEvent[] = Array.isArray( raw )
+			? ( raw as TimelineEvent[] )
+			: [];
 		yield setTimeline( customerId, events );
 		return events;
 	} catch ( e ) {

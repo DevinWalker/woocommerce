@@ -49,24 +49,53 @@ interface EventRowProps {
 	event: TimelineEvent;
 }
 
-const EventRow = ( { event }: EventRowProps ) => (
-	<li
-		className={ `wc-customer-view__timeline-event wc-customer-view__timeline-event--${ event.type }` }
-	>
-		<span className="wc-customer-view__timeline-type">{ event.type }</span>
-		<time
-			className="wc-customer-view__timeline-time"
-			dateTime={ event.occurred_at }
+type Payload = Record< string, unknown >;
+
+const summarize = ( type: string, payload: Payload ): string => {
+	switch ( type ) {
+		case 'note_added':
+			return String( payload.content ?? '' );
+		case 'payment_event':
+			return [
+				payload.event_type,
+				payload.amount,
+				payload.currency,
+				`via ${ payload.gateway }`,
+				`(${ payload.status })`,
+			]
+				.filter( Boolean )
+				.join( ' ' );
+		case 'order_placed':
+			return `Order #${ payload.order_id } — ${ payload.status } (${ payload.total_sales })`;
+		default:
+			return JSON.stringify( payload );
+	}
+};
+
+const EventRow = ( { event }: EventRowProps ) => {
+	const payload =
+		event.payload && typeof event.payload === 'object'
+			? ( event.payload as Payload )
+			: ( {} as Payload );
+	return (
+		<li
+			className={ `wc-customer-view__timeline-event wc-customer-view__timeline-event--${ event.type }` }
 		>
-			{ formatRelative( event.occurred_at ) }
-		</time>
-		<div className="wc-customer-view__timeline-payload">
-			{ event.payload && typeof event.payload === 'object'
-				? JSON.stringify( event.payload )
-				: String( event.payload ?? '' ) }
-		</div>
-	</li>
-);
+			<span className="wc-customer-view__timeline-type">
+				{ event.type }
+			</span>
+			<time
+				className="wc-customer-view__timeline-time"
+				dateTime={ event.occurred_at }
+			>
+				{ formatRelative( event.occurred_at ) }
+			</time>
+			<div className="wc-customer-view__timeline-payload">
+				{ summarize( event.type, payload ) }
+			</div>
+		</li>
+	);
+};
 
 export function Timeline( { customerId }: { customerId: number } ) {
 	const [ activeTypes, setActiveTypes ] = useState< string[] >( [] );

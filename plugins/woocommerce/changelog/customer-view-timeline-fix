@@ -1,0 +1,3 @@
+Significance: patch
+Type: fix
+Comment: Rewrite TimelineAssembler to use three single-table queries merged in PHP instead of a UNION ALL with CONCAT_WS, which crashed on the SQLite drop-in. The frontend timeline now renders structured payloads (note content, payment event details, order metadata) instead of pipe-joined strings, and all customer-view selectors coerce non-array values to [] defensively.

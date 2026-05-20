@@ -26,6 +26,9 @@ import type {
 
 const fail = ( customerId: number, msg: string ) => setError( customerId, msg );
 
+const asArray = < T >( value: unknown ): T[] =>
+	Array.isArray( value ) ? ( value as T[] ) : [];
+
 export function* getCustomer( customerId: number ) {
 	try {
 		const customer: Customer = yield apiFetch( {
@@ -42,10 +45,10 @@ export function* getCustomer( customerId: number ) {
 
 export function* getNotes( customerId: number ) {
 	try {
-		const notes: CustomerNote[] = yield apiFetch( {
+		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/notes`,
 		} );
-		yield setNotes( customerId, notes );
+		yield setNotes( customerId, asArray< CustomerNote >( raw ) );
 	} catch ( e ) {
 		yield fail(
 			customerId,
@@ -56,10 +59,10 @@ export function* getNotes( customerId: number ) {
 
 export function* getTags( customerId: number ) {
 	try {
-		const tags: CustomerTag[] = yield apiFetch( {
+		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/tags`,
 		} );
-		yield setTags( customerId, tags );
+		yield setTags( customerId, asArray< CustomerTag >( raw ) );
 	} catch ( e ) {
 		yield fail(
 			customerId,
@@ -70,10 +73,10 @@ export function* getTags( customerId: number ) {
 
 export function* getTimeline( customerId: number ) {
 	try {
-		const events: TimelineEvent[] = yield apiFetch( {
+		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/timeline`,
 		} );
-		yield setTimeline( customerId, events );
+		yield setTimeline( customerId, asArray< TimelineEvent >( raw ) );
 	} catch ( e ) {
 		yield fail(
 			customerId,
@@ -84,10 +87,10 @@ export function* getTimeline( customerId: number ) {
 
 export function* getPaymentEvents( customerId: number ) {
 	try {
-		const events: PaymentEvent[] = yield apiFetch( {
+		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/${ customerId }/payment-events`,
 		} );
-		yield setPaymentEvents( customerId, events );
+		yield setPaymentEvents( customerId, asArray< PaymentEvent >( raw ) );
 	} catch ( e ) {
 		yield fail(
 			customerId,
@@ -98,10 +101,10 @@ export function* getPaymentEvents( customerId: number ) {
 
 export function* getAllTags() {
 	try {
-		const tags: CustomerTag[] = yield apiFetch( {
+		const raw: unknown = yield apiFetch( {
 			path: `${ REST_NAMESPACE }/tags`,
 		} );
-		yield setAllTags( tags );
+		yield setAllTags( asArray< CustomerTag >( raw ) );
 	} catch ( e ) {
 		// no-op
 	}
