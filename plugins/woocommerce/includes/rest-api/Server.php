@@ -28,6 +28,8 @@ use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\TagsControlle
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\TimelineController as CustomerViewTimelineController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\PaymentEventsController as CustomerViewPaymentEventsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\LifecycleController as CustomerViewLifecycleController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\MergeController as CustomerViewMergeController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\PromoteController as CustomerViewPromoteController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\General\Controller as GeneralSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Email\Controller as EmailSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Tax\Controller as TaxSettingsController;
@@ -248,6 +250,8 @@ class Server {
 			'customer-view-timeline'    => CustomerViewTimelineController::class,
 			'customer-view-payments'    => CustomerViewPaymentEventsController::class,
 			'customer-view-lifecycle'   => CustomerViewLifecycleController::class,
+			'customer-view-merge'       => CustomerViewMergeController::class,
+			'customer-view-promote'     => CustomerViewPromoteController::class,
 			'order-notes'               => OrderNotesController::class,
 			'shipping-zones'            => ShippingZonesController::class,
 			'shipping-zone-method'      => ShippingZoneMethodController::class,
