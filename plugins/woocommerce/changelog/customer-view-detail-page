@@ -1,0 +1,3 @@
+Significance: minor
+Type: add
+Comment: Build the customer detail page sections: header with quick actions, stats strip, timeline with filters, notes, tags, orders, addresses, payment events, subscriptions (conditional), merge and lifecycle override modals, and a React Slot for extensions.

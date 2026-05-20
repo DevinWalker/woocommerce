@@ -8,8 +8,18 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import { registerCustomerViewStore, STORE_NAME } from '../data/store';
 import type { Customer } from '../data/types';
+import { Header } from './header';
+import { StatsStrip } from './stats-strip';
+import { Timeline } from './timeline';
+import { NotesSection } from './notes-section';
+import { OrdersSection } from './orders-section';
+import { AddressesSection } from './addresses-section';
+import { PaymentEventsSection } from './payment-events-section';
+import { SubscriptionsSection } from './subscriptions-section';
+import { ExtensionSlot } from './extension-slot';
 
 registerCustomerViewStore();
 
@@ -65,19 +75,23 @@ export default function CustomerDetail( { params }: Props ) {
 		return null;
 	}
 
-	const displayName =
-		`${ customer.first_name } ${ customer.last_name }`.trim() ||
-		customer.email;
-
 	return (
 		<div className="wc-customer-view">
-			<h1>{ displayName }</h1>
-			<p>{ customer.email }</p>
-			<p
-				className={ `wc-lifecycle wc-lifecycle--${ customer.lifecycle_status }` }
-			>
-				{ customer.lifecycle_status }
-			</p>
+			<Header customer={ customer } />
+			<StatsStrip customer={ customer } />
+			<div className="wc-customer-view__grid">
+				<div className="wc-customer-view__column wc-customer-view__column--main">
+					<Timeline customerId={ customer.id } />
+					<OrdersSection customer={ customer } />
+					<SubscriptionsSection customerId={ customer.id } />
+					<PaymentEventsSection customerId={ customer.id } />
+				</div>
+				<div className="wc-customer-view__column wc-customer-view__column--side">
+					<NotesSection customerId={ customer.id } />
+					<AddressesSection customer={ customer } />
+				</div>
+			</div>
+			<ExtensionSlot customer={ customer } />
 		</div>
 	);
 }
