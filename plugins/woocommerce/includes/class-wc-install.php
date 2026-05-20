@@ -2100,6 +2100,22 @@ CREATE TABLE {$wpdb->prefix}wc_customer_tag_relationships (
 	PRIMARY KEY  (customer_id, tag_id),
 	KEY tag (tag_id)
 ) $collate;
+CREATE TABLE {$wpdb->prefix}wc_customer_payment_events (
+	event_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	customer_id bigint(20) unsigned NOT NULL,
+	order_id bigint(20) unsigned NOT NULL,
+	type varchar(20) NOT NULL,
+	amount decimal(26,8) NOT NULL,
+	currency char(3) NOT NULL,
+	gateway varchar(100) NOT NULL,
+	status varchar(40) NOT NULL,
+	external_id varchar(200) NULL DEFAULT NULL,
+	created_at datetime NOT NULL,
+	PRIMARY KEY  (event_id),
+	KEY customer_time (customer_id, created_at),
+	KEY order_id (order_id),
+	UNIQUE KEY external (gateway, external_id)
+) $collate;
 $hpos_table_schema;
 $stock_notifications_table_schema;
 		";
@@ -2153,6 +2169,7 @@ $stock_notifications_table_schema;
 			"{$wpdb->prefix}wc_customer_notes",
 			"{$wpdb->prefix}wc_customer_tags",
 			"{$wpdb->prefix}wc_customer_tag_relationships",
+			"{$wpdb->prefix}wc_customer_payment_events",
 			"{$wpdb->prefix}wc_category_lookup",
 			"{$wpdb->prefix}wc_order_fulfillments",
 			"{$wpdb->prefix}wc_order_fulfillment_meta",

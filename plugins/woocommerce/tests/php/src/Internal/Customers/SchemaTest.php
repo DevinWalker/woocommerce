@@ -33,6 +33,25 @@ class SchemaTest extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @testdox `wc_customer_payment_events` table exists after WC_Install::create_tables().
+	 */
+	public function test_wc_customer_payment_events_table_exists(): void {
+		$this->assert_table_exists( 'wc_customer_payment_events' );
+	}
+
+	/**
+	 * @testdox `wc_customer_payment_events` has a unique index on (gateway, external_id) for idempotent webhook replays.
+	 */
+	public function test_wc_customer_payment_events_has_unique_external_index(): void {
+		global $wpdb;
+		WC_Install::create_tables();
+		$table   = $wpdb->prefix . 'wc_customer_payment_events';
+		$indexes = $wpdb->get_results( "SHOW INDEX FROM {$table} WHERE Key_name='external'", ARRAY_A );
+		$this->assertNotEmpty( $indexes, 'expected `external` index on wc_customer_payment_events' );
+		$this->assertSame( '0', (string) $indexes[0]['Non_unique'], '`external` index should be unique' );
+	}
+
+	/**
 	 * Helper: install and assert that `{prefix}{$name}` exists.
 	 *
 	 * @param string $name Table name without prefix.
