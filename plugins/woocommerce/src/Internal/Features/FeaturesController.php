@@ -650,6 +650,18 @@ class FeaturesController {
 				'is_experimental'              => true,
 				'disable_ui'                   => false,
 			),
+			'customer_view'                      => array(
+				'name'                         => __( 'Customer view', 'woocommerce' ),
+				'description'                  => __(
+					'Dedicated customer record page in wp-admin with notes, tags, lifecycle status, activity timeline, and quick actions.',
+					'woocommerce'
+				),
+				'is_experimental'              => true,
+				'enabled_by_default'           => false,
+				'disable_ui'                   => false,
+				'skip_compatibility_checks'    => true,
+				'default_plugin_compatibility' => FeaturePluginCompatibility::COMPATIBLE,
+			),
 		);
 
 		if ( ! $tracking_enabled ) {
