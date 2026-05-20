@@ -1,0 +1,4 @@
+Significance: minor
+Type: add
+
+Add /wc/v4/customer-view/:customer_id REST endpoint returning the enriched customer record (lifecycle status, tags, notes count, merge state). Distinct from the existing /wc/v4/customers user-keyed endpoint so guest customers and merged records can be addressed by wc_customer_lookup.customer_id.
