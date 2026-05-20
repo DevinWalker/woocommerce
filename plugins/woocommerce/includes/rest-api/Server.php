@@ -24,6 +24,7 @@ use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\OfflinePaymentMet
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Customers\Controller as CustomersController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\Controller as CustomerViewController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\NotesController as CustomerViewNotesController;
+use Automattic\WooCommerce\Internal\RestApi\Routes\V4\CustomerView\TagsController as CustomerViewTagsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\General\Controller as GeneralSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Email\Controller as EmailSettingsController;
 use Automattic\WooCommerce\Internal\RestApi\Routes\V4\Settings\Tax\Controller as TaxSettingsController;
@@ -240,6 +241,7 @@ class Server {
 			'customers'                 => CustomersController::class,
 			'customer-view'             => CustomerViewController::class,
 			'customer-view-notes'       => CustomerViewNotesController::class,
+			'customer-view-tags'        => CustomerViewTagsController::class,
 			'order-notes'               => OrderNotesController::class,
 			'shipping-zones'            => ShippingZonesController::class,
 			'shipping-zone-method'      => ShippingZoneMethodController::class,
