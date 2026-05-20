@@ -760,6 +760,7 @@ final class WooCommerce {
 		include_once WC_ABSPATH . 'includes/admin/marketplace-suggestions/class-wc-marketplace-updater.php';
 		include_once WC_ABSPATH . 'includes/admin/class-wc-admin-marketplace-promotions.php';
 		include_once WC_ABSPATH . 'includes/blocks/class-wc-blocks-utils.php';
+		include_once WC_ABSPATH . 'includes/customers/class-wc-customer-payment-events.php';
 
 		/**
 		 * Data stores - used to store and retrieve CRUD object data from the database.
